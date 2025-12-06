@@ -8,62 +8,74 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import CustomButton from '../components/CustomButton';
-import { loginSuperAdmin } from '../api/auth';
+import { registerSuperAdmin } from '../api/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from '../utils/constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const LoginScreen = ({ navigation }: any) => {
+const RegisterScreen = ({ navigation }: any) => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [confirm, setConfirm] = useState('');
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      return Alert.alert('Error', 'Email and password required');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const handleRegister = async () => {
+    if (!name || !email || !password || !confirm) {
+      return Alert.alert('Error', 'All fields are required');
+    }
+
+    if (password !== confirm) {
+      return Alert.alert('Error', 'Passwords do not match');
     }
 
     try {
-      setLoading(true);
-
-      const data = await loginSuperAdmin({ email, password });
-
-      // ✅ STORE LOGIN DATA SAFELY
-      await AsyncStorage.multiSet([
-        [STORAGE_KEYS.TOKEN, data?.access_token || ''],
-        [STORAGE_KEYS.ROLE, data?.role || ''],
-        [STORAGE_KEYS.USER_NAME, data?.user?.name || ''],
-      ]);
-
-      // ✅ ✅ ✅ ALWAYS NAVIGATE TO DRAWER (NOT DASHBOARD)
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'SuperAdminHome' }],
+      const data = await registerSuperAdmin({
+        name,
+        email,
+        phone,
+        password,
       });
 
+      await AsyncStorage.multiSet([
+        [STORAGE_KEYS.TOKEN, data.access_token],
+        [STORAGE_KEYS.ROLE, data.role],
+        [STORAGE_KEYS.USER_NAME, data.user?.name || ''],
+      ]);
+
+      Alert.alert('Success', 'Registration successful! Please login.', [
+        {
+          text: 'OK',
+          onPress: () => navigation.replace('Login'),
+        },
+      ]);
     } catch (error: any) {
-      console.log('LOGIN ERROR:', error?.response?.data);
-
       const msg =
-        error?.response?.data?.message?.message ||
         error?.response?.data?.message ||
-        'Invalid email or password';
+        error?.response?.data?.message?.message ||
+        'Registration failed';
 
-      Alert.alert('Login Failed', String(msg));
-    } finally {
-      setLoading(false);
+      Alert.alert('Register failed', String(msg));
     }
   };
 
   return (
     <View style={styles.root}>
       <View style={styles.card}>
-
-        <Text style={styles.heading}>Welcome Back</Text>
+        <Text style={styles.heading}>Create Super Admin</Text>
         <Text style={styles.subtitle}>Enter your details below</Text>
 
-        {/* ✅ EMAIL INPUT */}
+        <TextInput
+          placeholder="Name"
+          style={styles.input}
+          value={name}
+          onChangeText={setName}
+          placeholderTextColor="#9CA3AF"
+        />
+
         <TextInput
           placeholder="Email"
           style={styles.input}
@@ -74,7 +86,7 @@ const LoginScreen = ({ navigation }: any) => {
           keyboardType="email-address"
         />
 
-        {/* ✅ PASSWORD WITH EYE ICON */}
+        {/* ✅ PASSWORD */}
         <View style={styles.passwordRow}>
           <TextInput
             placeholder="Password"
@@ -84,11 +96,7 @@ const LoginScreen = ({ navigation }: any) => {
             onChangeText={setPassword}
             placeholderTextColor="#9CA3AF"
           />
-
-          <TouchableOpacity
-            onPress={() => setShowPassword(!showPassword)}
-            style={styles.iconBtn}
-          >
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             <Ionicons
               name={showPassword ? 'eye-off-outline' : 'eye-outline'}
               size={22}
@@ -97,18 +105,30 @@ const LoginScreen = ({ navigation }: any) => {
           </TouchableOpacity>
         </View>
 
-        {/* ✅ LOGIN BUTTON */}
-        <CustomButton
-          title={loading ? 'Logging in...' : 'Login'}
-          onPress={handleLogin}
-          disabled={loading}
-        />
+        {/* ✅ CONFIRM PASSWORD */}
+        <View style={styles.passwordRow}>
+          <TextInput
+            placeholder="Confirm Password"
+            secureTextEntry={!showConfirm}
+            style={styles.passwordInput}
+            value={confirm}
+            onChangeText={setConfirm}
+            placeholderTextColor="#9CA3AF"
+          />
+          <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)}>
+            <Ionicons
+              name={showConfirm ? 'eye-off-outline' : 'eye-outline'}
+              size={22}
+              color="#9CA3AF"
+            />
+          </TouchableOpacity>
+        </View>
 
-        {/* ✅ REGISTER LINK */}
-        <TouchableOpacity onPress={() => navigation.replace('Register')}>
-          <Text style={styles.link}>New user? Register</Text>
+        <CustomButton title="Register" onPress={handleRegister} />
+
+        <TouchableOpacity onPress={() => navigation.replace('Login')}>
+          <Text style={styles.link}>Already have an account? Login</Text>
         </TouchableOpacity>
-
       </View>
     </View>
   );
@@ -152,7 +172,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     color: '#E5E7EB',
     marginTop: 14,
-    fontSize: 14,
   },
 
   passwordRow: {
@@ -170,19 +189,13 @@ const styles = StyleSheet.create({
     flex: 1,
     color: '#E5E7EB',
     paddingVertical: 12,
-    fontSize: 14,
-  },
-
-  iconBtn: {
-    paddingLeft: 10,
   },
 
   link: {
     color: '#60A5FA',
     textAlign: 'center',
     marginTop: 16,
-    fontSize: 14,
   },
 });
 
-export default LoginScreen;
+export default RegisterScreen;
