@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from '../utils/constants';
+import { useTheme } from './context/ThemeContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const MENU_ITEMS = [
@@ -14,7 +15,9 @@ const MENU_ITEMS = [
   'CreateCoach',
 ];
 
-const Sidebar = ({ active, setActive, toggleSidebar }: any) => {
+const Sidebar = ({ active, setActive, closeSidebar }: any) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   const handleLogout = async () => {
     await AsyncStorage.multiRemove([
@@ -26,35 +29,68 @@ const Sidebar = ({ active, setActive, toggleSidebar }: any) => {
   };
 
   return (
-    <View style={styles.sidebar}>
+    <View
+      style={[
+        styles.sidebar,
+        { backgroundColor: isDark ? '#050816' : '#F1F5F9' },
+      ]}
+    >
+      {/* ✅ TOP ROW WITH DRAWER ICON */}
+      <View style={styles.topRow}>
+        <Text
+          style={[
+            styles.title,
+            { color: isDark ? '#E5E7EB' : '#020617' },
+          ]}
+        >
+          Super Admin
+        </Text>
 
-      {/* HEADER WITH CLOSE ICON */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Super Admin</Text>
-
-        <TouchableOpacity onPress={toggleSidebar}>
-          <Ionicons name="close" size={24} color="#fff" />
+        <TouchableOpacity onPress={closeSidebar} style={styles.drawerBtn}>
+          <Ionicons
+            name="menu"
+            size={24}
+            color={isDark ? '#FFFFFF' : '#000000'}
+          />
         </TouchableOpacity>
       </View>
 
-      {/* MENU */}
+      {/* ✅ MENU ITEMS */}
       {MENU_ITEMS.map(item => (
         <TouchableOpacity
           key={item}
-          style={[styles.item, active === item && styles.activeItem]}
+          style={[
+            styles.item,
+            active === item && {
+              backgroundColor: isDark ? '#111827' : '#E2E8F0',
+            },
+          ]}
           onPress={() => setActive(item)}
         >
-          <Text style={styles.itemText}>{item}</Text>
+          <Text
+            style={[
+              styles.itemText,
+              { color: isDark ? '#9CA3AF' : '#020617' },
+            ]}
+          >
+            {item}
+          </Text>
         </TouchableOpacity>
       ))}
 
       <View style={{ flex: 1 }} />
 
-      {/* LOGOUT */}
+      {/* ✅ LOGOUT */}
       <TouchableOpacity style={styles.logout} onPress={handleLogout}>
-        <Text style={styles.logoutText}>Logout</Text>
+        <Text
+          style={[
+            styles.logoutText,
+            { color: isDark ? '#F97373' : '#DC2626' },
+          ]}
+        >
+          Logout
+        </Text>
       </TouchableOpacity>
-
     </View>
   );
 };
@@ -62,47 +98,45 @@ const Sidebar = ({ active, setActive, toggleSidebar }: any) => {
 const styles = StyleSheet.create({
   sidebar: {
     width: 240,
-    backgroundColor: '#050816',
-    paddingTop: 40,
-    paddingHorizontal: 12,
+    paddingTop: 28,        // ✅ MORE TOP SPACE
+    paddingHorizontal: 16, // ✅ MORE SIDE SPACE
   },
 
-  header: {
+  topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 28,      // ✅ MORE SPACE BELOW HEADER
   },
 
   title: {
-    color: '#E5E7EB',
     fontSize: 20,
     fontWeight: '700',
   },
 
-  item: {
-    paddingVertical: 12,
+  drawerBtn: {
+    padding: 6,           // ✅ TOUCH FRIENDLY ICON
   },
 
-  activeItem: {
-    backgroundColor: '#111827',
-    borderRadius: 6,
-    paddingHorizontal: 8,
+  item: {
+    paddingVertical: 14,  // ✅ MORE MENU SPACE
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    marginBottom: 6,      // ✅ GAP BETWEEN ITEMS
   },
 
   itemText: {
-    color: '#9CA3AF',
     fontSize: 16,
   },
 
   logout: {
-    paddingVertical: 12,
+    paddingVertical: 16,  // ✅ BETTER BOTTOM SPACE
     borderTopWidth: 1,
     borderTopColor: '#374151',
+    marginTop: 10,
   },
 
   logoutText: {
-    color: '#F97373',
     fontSize: 16,
     fontWeight: '600',
   },

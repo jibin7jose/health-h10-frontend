@@ -11,12 +11,22 @@ import CreateCoach from './CreateCoach';
 
 import Sidebar from '../../components/Sidebar';
 import Navbar from '../../components/Navbar';
+import { useTheme } from '../../components/context/ThemeContext';
 
 const SuperAdminHome = () => {
+  const { theme } = useTheme();
+
   const [activeScreen, setActiveScreen] = useState<
-    'Dashboard' | 'Events' | 'Compare' | 'Advice' | 'Reports' | 'CreateClub' | 'CreateCoach'
+    | 'Dashboard'
+    | 'Events'
+    | 'Compare'
+    | 'Advice'
+    | 'Reports'
+    | 'CreateClub'
+    | 'CreateCoach'
   >('Dashboard');
 
+  // ✅ SIDEBAR OPEN BY DEFAULT
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const toggleSidebar = () => {
@@ -37,23 +47,30 @@ const SuperAdminHome = () => {
   };
 
   return (
-    <View style={styles.container}>
-
-      {/* SIDEBAR */}
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: theme === 'dark' ? '#020617' : '#F1F5F9' },
+      ]}
+    >
+      {/* ✅ SIDEBAR */}
       {sidebarOpen && (
         <Sidebar
           active={activeScreen}
           setActive={setActiveScreen}
-          toggleSidebar={toggleSidebar}   // <-- IMPORTANT
+          closeSidebar={toggleSidebar}   // ✅ PASS CLOSE FUNCTION
         />
       )}
 
-      {/* PAGE CONTENT */}
+      {/* ✅ MAIN CONTENT */}
       <View style={styles.content}>
-        <Navbar title={activeScreen} toggleSidebar={toggleSidebar} />
+        <Navbar
+          title={activeScreen}
+          toggleSidebar={toggleSidebar}
+          sidebarOpen={sidebarOpen}
+        />
         {renderScreen()}
       </View>
-
     </View>
   );
 };
@@ -62,7 +79,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: '#020617',
   },
   content: {
     flex: 1,
