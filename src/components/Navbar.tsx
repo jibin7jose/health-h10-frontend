@@ -1,27 +1,27 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useNavigation, DrawerActions } from '@react-navigation/native';
 
 interface Props {
   title: string;
+  toggleSidebar: () => void;
 }
 
-const Navbar: React.FC<Props> = ({ title }) => {
-  const navigation = useNavigation();
-
+const Navbar: React.FC<Props> = ({ title, toggleSidebar }) => {
   return (
     <View style={styles.container}>
-      {/* ✅ DRAWER MENU BUTTON */}
-      <TouchableOpacity
-        onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
-        style={styles.menuBtn}
-      >
-        <Ionicons name="menu" size={26} color="#fff" />
+
+      {/* ✅ LEFT SIDE: LOGO + TITLE */}
+      <View style={styles.left}>
+        <Text style={styles.logo}>Tabb Control</Text>
+        <Text style={styles.title}>{title}</Text>
+      </View>
+
+      {/* ✅ RIGHT SIDE: DRAWER ICON */}
+      <TouchableOpacity onPress={toggleSidebar} style={styles.menuBtn}>
+        <Ionicons name="menu" size={26} color="#FFFFFF" />
       </TouchableOpacity>
 
-      <Text style={styles.logo}>Tabb Control</Text>
-      <Text style={styles.title}>{title}</Text>
     </View>
   );
 };
@@ -31,21 +31,32 @@ const styles = StyleSheet.create({
     height: 56,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between', // ✅ PUSHES ICON TO RIGHT
     paddingHorizontal: 16,
     backgroundColor: '#050816',
+    borderBottomWidth: 1,
+    borderBottomColor: '#111827',
   },
-  menuBtn: {
-    marginRight: 14,
+
+  left: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
+
   logo: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 18,
   },
+
   title: {
-    marginLeft: 16,
+    marginLeft: 12,
     color: '#9CA3AF',
     fontSize: 16,
+  },
+
+  menuBtn: {
+    padding: 4,
   },
 });
 

@@ -1,17 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import Navbar from '../../components/Navbar';
 
 const Events = () => {
   return (
     <View style={styles.container}>
-      {/* ✅ TOP NAVBAR WITH MENU BUTTON */}
-      <Navbar title="Events" />
-
-      {/* ✅ PAGE BODY */}
-      <View style={styles.body}>
-        <Text style={styles.text}>Events Screen</Text>
-      </View>
+      <Text style={styles.text}>Welcome to Events Page 🎉</Text>
     </View>
   );
 };
@@ -20,14 +13,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#020617',
-  },
-  body: {
-    flex: 1,
-    padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   text: {
     color: '#E5E7EB',
-    fontSize: 16,
+    fontSize: 18,
   },
 });
 

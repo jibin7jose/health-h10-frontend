@@ -1,28 +1,25 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import Navbar from '../../components/Navbar';
 
-const Dashboard = () => (
-  <View style={{ flex: 1, backgroundColor: '#020617' }}>
-    <Navbar title="Dashboard" />
-    <View style={styles.body}>
-      <Text style={styles.text}>Dashboard content here</Text>
+const Dashboard = () => {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>Welcome to Super Admin Dashboard 👋</Text>
     </View>
-  </View>
-);
-
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#020617',
-  },
-  body: {
-    flex: 1,
-    padding: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   text: {
     color: '#E5E7EB',
+    fontSize: 20,
+    fontWeight: '600',
   },
 });
 

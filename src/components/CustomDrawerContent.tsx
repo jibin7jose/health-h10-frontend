@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from '../utils/constants';
 
 const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
-  const { state, navigation } = props;
+  const { navigation } = props;
 
   const handleLogout = async () => {
     await AsyncStorage.multiRemove([
@@ -24,16 +24,16 @@ const CustomDrawerContent: React.FC<DrawerContentComponentProps> = props => {
     <View style={styles.container}>
       <Text style={styles.title}>Super Admin</Text>
 
-      {/* ✅ KEEP DRAWER OPEN WHEN CHANGING SCREENS */}
-      {state.routeNames.map((name, index) => (
+      {props.state.routeNames.map((name, index) => (
         <TouchableOpacity
           key={name}
           style={[
             styles.item,
-            state.index === index && styles.itemActive,
+            props.state.index === index && styles.itemActive,
           ]}
           onPress={() => {
-            navigation.jumpTo(name as never); // ✅ DOES NOT CLOSE DRAWER
+            navigation.navigate(name as never);
+            // ✅ Drawer will NOT close now
           }}
         >
           <Text style={styles.itemText}>{name}</Text>
