@@ -1,23 +1,46 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from '../utils/constants';
 import { useTheme } from './context/ThemeContext';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const MENU_ITEMS = [
-  'Dashboard',
-  'Events',
-  'Compare',
-  'Advice',
-  'Reports',
-  'CreateClub',
-  'CreateCoach',
-];
+/* ✅ ✅ ✅ MENU KEYS MUST MATCH SuperAdminHome EXACTLY */
+const MENU_BY_ROLE: Record<string, string[]> = {
+  SUPER_ADMIN: [
+    'Dashboard',
+    'Events',
+    'Compare',
+    'Advice',
+    'Reports',
+    'CreateClub',     // ✅ FIXED
+    'CreateCoach',    // ✅ FIXED
+    'Clubs',          // ✅ FIXED
+    'ClubAdmins',    // ✅ FIXED
+  ],
+  CLUB_ADMIN: [
+    'Dashboard',
+    'Events',
+    'Players',
+    'Coaches',
+    'Reports',
+  ],
+};
 
 const Sidebar = ({ active, setActive, closeSidebar }: any) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+
+  const [role, setRole] = useState<string | null>(null);
+
+  /* ✅ LOAD ROLE */
+  useEffect(() => {
+    const loadRole = async () => {
+      const storedRole = await AsyncStorage.getItem(STORAGE_KEYS.ROLE);
+      setRole(storedRole || 'SUPER_ADMIN');
+    };
+    loadRole();
+  }, []);
 
   const handleLogout = async () => {
     await AsyncStorage.multiRemove([
@@ -28,6 +51,8 @@ const Sidebar = ({ active, setActive, closeSidebar }: any) => {
     setActive('Dashboard');
   };
 
+  const menuItems = MENU_BY_ROLE[role || 'SUPER_ADMIN'] || [];
+
   return (
     <View
       style={[
@@ -35,7 +60,7 @@ const Sidebar = ({ active, setActive, closeSidebar }: any) => {
         { backgroundColor: isDark ? '#050816' : '#F1F5F9' },
       ]}
     >
-      {/* ✅ TOP ROW WITH DRAWER ICON */}
+      {/* ✅ HEADER */}
       <View style={styles.topRow}>
         <Text
           style={[
@@ -43,7 +68,7 @@ const Sidebar = ({ active, setActive, closeSidebar }: any) => {
             { color: isDark ? '#E5E7EB' : '#020617' },
           ]}
         >
-          Super Admin
+          {role === 'CLUB_ADMIN' ? 'Club Admin' : 'Super Admin'}
         </Text>
 
         <TouchableOpacity onPress={closeSidebar} style={styles.drawerBtn}>
@@ -55,8 +80,8 @@ const Sidebar = ({ active, setActive, closeSidebar }: any) => {
         </TouchableOpacity>
       </View>
 
-      {/* ✅ MENU ITEMS */}
-      {MENU_ITEMS.map(item => (
+      {/* ✅ ✅ ✅ MENU NOW MATCHES SuperAdminHome */}
+      {menuItems.map(item => (
         <TouchableOpacity
           key={item}
           style={[
@@ -98,15 +123,15 @@ const Sidebar = ({ active, setActive, closeSidebar }: any) => {
 const styles = StyleSheet.create({
   sidebar: {
     width: 240,
-    paddingTop: 28,        // ✅ MORE TOP SPACE
-    paddingHorizontal: 16, // ✅ MORE SIDE SPACE
+    paddingTop: 28,
+    paddingHorizontal: 16,
   },
 
   topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 28,      // ✅ MORE SPACE BELOW HEADER
+    marginBottom: 28,
   },
 
   title: {
@@ -115,14 +140,14 @@ const styles = StyleSheet.create({
   },
 
   drawerBtn: {
-    padding: 6,           // ✅ TOUCH FRIENDLY ICON
+    padding: 6,
   },
 
   item: {
-    paddingVertical: 14,  // ✅ MORE MENU SPACE
+    paddingVertical: 14,
     paddingHorizontal: 12,
     borderRadius: 10,
-    marginBottom: 6,      // ✅ GAP BETWEEN ITEMS
+    marginBottom: 6,
   },
 
   itemText: {
@@ -130,7 +155,7 @@ const styles = StyleSheet.create({
   },
 
   logout: {
-    paddingVertical: 16,  // ✅ BETTER BOTTOM SPACE
+    paddingVertical: 16,
     borderTopWidth: 1,
     borderTopColor: '#374151',
     marginTop: 10,

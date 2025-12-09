@@ -7,6 +7,7 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
+
 import CustomButton from '../components/CustomButton';
 import { loginSuperAdmin } from '../api/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -29,18 +30,35 @@ const LoginScreen = ({ navigation }: any) => {
 
       const data = await loginSuperAdmin({ email, password });
 
-      // ✅ STORE LOGIN DATA SAFELY
+      // STORE AUTH DATA
       await AsyncStorage.multiSet([
         [STORAGE_KEYS.TOKEN, data?.access_token || ''],
         [STORAGE_KEYS.ROLE, data?.role || ''],
         [STORAGE_KEYS.USER_NAME, data?.user?.name || ''],
       ]);
 
-      // ✅ ✅ ✅ ALWAYS NAVIGATE TO DRAWER (NOT DASHBOARD)
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'SuperAdminHome' }],
-      });
+      // ROLE BASED NAVIGATION
+      if (data.role === 'SUPER_ADMIN') {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'SuperAdminHome' }],
+        });
+      }
+      else if (data.role === 'CLUB_ADMIN') {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'ClubAdminHome' }],
+        });
+      }
+      else if (data.role === 'COACH') {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'CoachHome' }],
+        });
+      }
+      else {
+        Alert.alert('Access Denied', 'Invalid role assigned');
+      }
 
     } catch (error: any) {
       console.log('LOGIN ERROR:', error?.response?.data);
@@ -63,7 +81,6 @@ const LoginScreen = ({ navigation }: any) => {
         <Text style={styles.heading}>Welcome Back</Text>
         <Text style={styles.subtitle}>Enter your details below</Text>
 
-        {/* ✅ EMAIL INPUT */}
         <TextInput
           placeholder="Email"
           style={styles.input}
@@ -74,7 +91,6 @@ const LoginScreen = ({ navigation }: any) => {
           keyboardType="email-address"
         />
 
-        {/* ✅ PASSWORD WITH EYE ICON */}
         <View style={styles.passwordRow}>
           <TextInput
             placeholder="Password"
@@ -97,14 +113,12 @@ const LoginScreen = ({ navigation }: any) => {
           </TouchableOpacity>
         </View>
 
-        {/* ✅ LOGIN BUTTON */}
         <CustomButton
           title={loading ? 'Logging in...' : 'Login'}
           onPress={handleLogin}
           disabled={loading}
         />
 
-        {/* ✅ REGISTER LINK */}
         <TouchableOpacity onPress={() => navigation.replace('Register')}>
           <Text style={styles.link}>New user? Register</Text>
         </TouchableOpacity>
@@ -121,7 +135,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 28,
   },
-
   card: {
     backgroundColor: '#0F1629',
     padding: 28,
@@ -129,20 +142,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#1E293B',
   },
-
   heading: {
     color: '#F8FAFC',
     fontSize: 24,
     fontWeight: '700',
     marginBottom: 6,
   },
-
   subtitle: {
     color: '#94A3B8',
     fontSize: 14,
     marginBottom: 22,
   },
-
   input: {
     backgroundColor: '#020617',
     borderWidth: 1,
@@ -154,7 +164,6 @@ const styles = StyleSheet.create({
     marginTop: 14,
     fontSize: 14,
   },
-
   passwordRow: {
     backgroundColor: '#020617',
     borderWidth: 1,
@@ -165,18 +174,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-
   passwordInput: {
     flex: 1,
     color: '#E5E7EB',
     paddingVertical: 12,
     fontSize: 14,
   },
-
   iconBtn: {
     paddingLeft: 10,
   },
-
   link: {
     color: '#60A5FA',
     textAlign: 'center',
