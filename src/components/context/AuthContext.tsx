@@ -1,13 +1,25 @@
+// src/components/context/AuthContext.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { STORAGE_KEYS } from '../../utils/constants';
 
-const AuthContext = createContext<any>(null);
+interface AuthContextType {
+  role: string | null;
+  setRole: (r: string | null) => void;
+}
 
-export const AuthProvider = ({ children }: any) => {
+const AuthContext = createContext<AuthContextType>({
+  role: null,
+  setRole: () => {},
+});
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
-    AsyncStorage.getItem('role').then(setRole);
+    AsyncStorage.getItem(STORAGE_KEYS.ROLE).then(setRole);
   }, []);
 
   return (

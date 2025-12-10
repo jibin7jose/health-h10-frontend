@@ -1,3 +1,4 @@
+// src/screens/Auth/LoginScreen.tsx
 import React, { useState } from 'react';
 import {
   View,
@@ -7,16 +8,18 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-
-import CustomButton from '../components/CustomButton';
-import { loginSuperAdmin } from '../api/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { STORAGE_KEYS } from '../utils/constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import CustomButton from '../../components/CustomButton';
+import { loginUser } from '../../api/auth';
+import { STORAGE_KEYS } from '../../utils/constants';
 
 const LoginScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  // false = hidden, true = visible
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -27,42 +30,24 @@ const LoginScreen = ({ navigation }: any) => {
 
     try {
       setLoading(true);
+      const data = await loginUser({ email, password });
 
-      const data = await loginSuperAdmin({ email, password });
-
-      // STORE AUTH DATA
       await AsyncStorage.multiSet([
         [STORAGE_KEYS.TOKEN, data?.access_token || ''],
         [STORAGE_KEYS.ROLE, data?.role || ''],
         [STORAGE_KEYS.USER_NAME, data?.user?.name || ''],
       ]);
 
-      // ROLE BASED NAVIGATION
       if (data.role === 'SUPER_ADMIN') {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'SuperAdminHome' }],
-        });
-      }
-      else if (data.role === 'CLUB_ADMIN') {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'ClubAdminHome' }],
-        });
-      }
-      else if (data.role === 'COACH') {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'CoachHome' }],
-        });
-      }
-      else {
+        navigation.reset({ index: 0, routes: [{ name: 'SuperAdminHome' }] });
+      } else if (data.role === 'CLUB_ADMIN') {
+        navigation.reset({ index: 0, routes: [{ name: 'ClubAdminHome' }] });
+      } else if (data.role === 'COACH') {
+        navigation.reset({ index: 0, routes: [{ name: 'CoachHome' }] });
+      } else {
         Alert.alert('Access Denied', 'Invalid role assigned');
       }
-
     } catch (error: any) {
-      console.log('LOGIN ERROR:', error?.response?.data);
-
       const msg =
         error?.response?.data?.message?.message ||
         error?.response?.data?.message ||
@@ -77,10 +62,10 @@ const LoginScreen = ({ navigation }: any) => {
   return (
     <View style={styles.root}>
       <View style={styles.card}>
-
         <Text style={styles.heading}>Welcome Back</Text>
         <Text style={styles.subtitle}>Enter your details below</Text>
 
+        {/* EMAIL */}
         <TextInput
           placeholder="Email"
           style={styles.input}
@@ -91,10 +76,11 @@ const LoginScreen = ({ navigation }: any) => {
           keyboardType="email-address"
         />
 
+        {/* PASSWORD */}
         <View style={styles.passwordRow}>
           <TextInput
             placeholder="Password"
-            secureTextEntry={!showPassword}
+            secureTextEntry={!showPassword} // hidden when false
             style={styles.passwordInput}
             value={password}
             onChangeText={setPassword}
@@ -102,27 +88,31 @@ const LoginScreen = ({ navigation }: any) => {
           />
 
           <TouchableOpacity
-            onPress={() => setShowPassword(!showPassword)}
+            onPress={() => setShowPassword(prev => !prev)}
             style={styles.iconBtn}
           >
             <Ionicons
-              name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+              // 👇 YOUR CUSTOM MAPPING
+              // hidden (showPassword false)  → eye-off-outline
+              // visible (showPassword true)  → eye-outline
+              name={showPassword ? 'eye-outline' : 'eye-off-outline'}
               size={22}
               color="#9CA3AF"
             />
           </TouchableOpacity>
         </View>
 
+        <TouchableOpacity
+          onPress={() => navigation.navigate('ForgotPassword')}
+        >
+          <Text style={styles.forgot}>Forgot Password?</Text>
+        </TouchableOpacity>
+
         <CustomButton
           title={loading ? 'Logging in...' : 'Login'}
           onPress={handleLogin}
           disabled={loading}
         />
-
-        <TouchableOpacity onPress={() => navigation.replace('Register')}>
-          <Text style={styles.link}>New user? Register</Text>
-        </TouchableOpacity>
-
       </View>
     </View>
   );
@@ -183,11 +173,11 @@ const styles = StyleSheet.create({
   iconBtn: {
     paddingLeft: 10,
   },
-  link: {
+  forgot: {
     color: '#60A5FA',
-    textAlign: 'center',
-    marginTop: 16,
-    fontSize: 14,
+    fontSize: 13,
+    marginTop: 10,
+    textAlign: 'right',
   },
 });
 

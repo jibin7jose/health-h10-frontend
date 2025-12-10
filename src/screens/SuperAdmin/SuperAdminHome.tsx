@@ -1,26 +1,26 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Pressable,
+  StatusBar,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import SidebarSuperAdmin from '../../components/Sidebar/SidebarSuperAdmin';
+import SuperAdminNavbar from '../../components/Navbar/SuperAdminNavbar';
+import { useTheme } from '../../components/context/ThemeContext';
 
 import Dashboard from './Dashboard';
-import Events from './Events';
-import Compare from './Compare';
-import Advice from './Advice';
-import Reports from './Reports';
 import CreateClub from './CreateClub';
 import CreateCoach from './CreateCoach';
-import ClubsListScreen from './ClubsListScreen';
-import ClubAdminsListScreen from './ClubAdminsListScreen';
+import ClubsList from './ClubsList';
+import ClubAdminsList from './ClubAdminsList';
 
-import Sidebar from '../../components/Sidebar';
-import Navbar from '../../components/Navbar';
-import { useTheme } from '../../components/context/ThemeContext';
+const DRAWER_WIDTH = 260;
 
 type ScreenType =
   | 'Dashboard'
-  | 'Events'
-  | 'Compare'
-  | 'Advice'
-  | 'Reports'
   | 'CreateClub'
   | 'CreateCoach'
   | 'Clubs'
@@ -28,73 +28,98 @@ type ScreenType =
 
 const SuperAdminHome = () => {
   const { theme } = useTheme();
-  const [activeScreen, setActiveScreen] = useState<ScreenType>('Dashboard');
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [activeScreen, setActiveScreen] =
+    useState<ScreenType>('Dashboard');
 
-  const toggleSidebar = () => {
-    setSidebarOpen(prev => !prev);
-  };
+  const toggleSidebar = () => setSidebarOpen(prev => !prev);
 
   const renderScreen = () => {
     switch (activeScreen) {
       case 'Dashboard':
         return <Dashboard />;
-      case 'Events':
-        return <Events />;
-      case 'Compare':
-        return <Compare />;
-      case 'Advice':
-        return <Advice />;
-      case 'Reports':
-        return <Reports />;
       case 'CreateClub':
         return <CreateClub />;
       case 'CreateCoach':
         return <CreateCoach />;
       case 'Clubs':
-        return <ClubsListScreen />;
+        return <ClubsList />;
       case 'ClubAdmins':
-        return <ClubAdminsListScreen />;
+        return <ClubAdminsList />;
       default:
         return <Dashboard />;
     }
   };
 
   return (
-    <View
+    <SafeAreaView
+      edges={['top']}
       style={[
-        styles.container,
+        styles.safeArea,
         { backgroundColor: theme === 'dark' ? '#020617' : '#F1F5F9' },
       ]}
     >
-      {sidebarOpen && (
-        <Sidebar
+      {/* ✅ STATUS BAR */}
+      <StatusBar
+        barStyle={theme === 'dark' ? 'light-content' : 'dark-content'}
+        backgroundColor={theme === 'dark' ? '#020617' : '#F1F5F9'}
+      />
+
+      <View style={styles.container}>
+        {/* ✅ SIDEBAR */}
+        <SidebarSuperAdmin
           active={activeScreen}
           setActive={setActiveScreen}
-          closeSidebar={toggleSidebar}
+          isOpen={sidebarOpen}
+          closeSidebar={() => setSidebarOpen(false)}
         />
-      )}
 
-      <View style={styles.content}>
-        <Navbar
-          title={activeScreen}
-          toggleSidebar={toggleSidebar}
-          sidebarOpen={sidebarOpen}
-        />
-        {renderScreen()}
+        {/* ✅ OVERLAY */}
+        {sidebarOpen && (
+          <Pressable style={styles.overlay} onPress={toggleSidebar} />
+        )}
+
+        {/* ✅ CONTENT SHIFT */}
+        <View
+          style={[
+            styles.content,
+            { marginLeft: sidebarOpen ? DRAWER_WIDTH : 0 },
+          ]}
+        >
+          <SuperAdminNavbar
+            title={activeScreen}
+            toggleSidebar={toggleSidebar}
+            sidebarOpen={sidebarOpen}
+          />
+
+          {renderScreen()}
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+  },
+
   container: {
     flex: 1,
     flexDirection: 'row',
   },
+
   content: {
     flex: 1,
+  },
+
+  overlay: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    zIndex: 998,
   },
 });
 

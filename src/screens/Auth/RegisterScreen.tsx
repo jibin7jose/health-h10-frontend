@@ -1,3 +1,4 @@
+// src/screens/Auth/RegisterScreen.tsx
 import React, { useState } from 'react';
 import {
   View,
@@ -7,11 +8,12 @@ import {
   Alert,
   TouchableOpacity,
 } from 'react-native';
-import CustomButton from '../components/CustomButton';
-import { registerSuperAdmin } from '../api/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { STORAGE_KEYS } from '../utils/constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import CustomButton from '../../components/CustomButton';
+import { registerSuperAdmin } from '../../api/auth';
+import { STORAGE_KEYS } from '../../utils/constants';
 
 const RegisterScreen = ({ navigation }: any) => {
   const [name, setName] = useState('');
@@ -20,6 +22,7 @@ const RegisterScreen = ({ navigation }: any) => {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
 
+  // false = hidden, true = visible
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -46,10 +49,10 @@ const RegisterScreen = ({ navigation }: any) => {
         [STORAGE_KEYS.USER_NAME, data.user?.name || ''],
       ]);
 
-      Alert.alert('Success', 'Registration successful! Please login.', [
+      Alert.alert('Success', 'Registration successful!', [
         {
           text: 'OK',
-          onPress: () => navigation.replace('Login'),
+          onPress: () => navigation.replace('SuperAdminHome'),
         },
       ]);
     } catch (error: any) {
@@ -68,6 +71,7 @@ const RegisterScreen = ({ navigation }: any) => {
         <Text style={styles.heading}>Create Super Admin</Text>
         <Text style={styles.subtitle}>Enter your details below</Text>
 
+        {/* NAME */}
         <TextInput
           placeholder="Name"
           style={styles.input}
@@ -76,6 +80,7 @@ const RegisterScreen = ({ navigation }: any) => {
           placeholderTextColor="#9CA3AF"
         />
 
+        {/* EMAIL */}
         <TextInput
           placeholder="Email"
           style={styles.input}
@@ -86,38 +91,56 @@ const RegisterScreen = ({ navigation }: any) => {
           keyboardType="email-address"
         />
 
-        {/* ✅ PASSWORD */}
+        {/* PHONE */}
+        <TextInput
+          placeholder="Phone"
+          style={styles.input}
+          value={phone}
+          onChangeText={setPhone}
+          placeholderTextColor="#9CA3AF"
+          keyboardType="phone-pad"
+        />
+
+        {/* PASSWORD */}
         <View style={styles.passwordRow}>
           <TextInput
             placeholder="Password"
-            secureTextEntry={!showPassword}
+            secureTextEntry={!showPassword} // ✅ hidden when false
             style={styles.passwordInput}
             value={password}
             onChangeText={setPassword}
             placeholderTextColor="#9CA3AF"
           />
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+          <TouchableOpacity
+            onPress={() => setShowPassword(prev => !prev)}
+          >
             <Ionicons
-              name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+              // ✅ CUSTOM MAPPING (same as Login)
+              // hidden  -> eye-off-outline
+              // visible -> eye-outline
+              name={showPassword ? 'eye-outline' : 'eye-off-outline'}
               size={22}
               color="#9CA3AF"
             />
           </TouchableOpacity>
         </View>
 
-        {/* ✅ CONFIRM PASSWORD */}
+        {/* CONFIRM PASSWORD */}
         <View style={styles.passwordRow}>
           <TextInput
             placeholder="Confirm Password"
-            secureTextEntry={!showConfirm}
+            secureTextEntry={!showConfirm} // ✅ hidden when false
             style={styles.passwordInput}
             value={confirm}
             onChangeText={setConfirm}
             placeholderTextColor="#9CA3AF"
           />
-          <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)}>
+          <TouchableOpacity
+            onPress={() => setShowConfirm(prev => !prev)}
+          >
             <Ionicons
-              name={showConfirm ? 'eye-off-outline' : 'eye-outline'}
+              // ✅ SAME LOGIC
+              name={showConfirm ? 'eye-outline' : 'eye-off-outline'}
               size={22}
               color="#9CA3AF"
             />
@@ -127,7 +150,7 @@ const RegisterScreen = ({ navigation }: any) => {
         <CustomButton title="Register" onPress={handleRegister} />
 
         <TouchableOpacity onPress={() => navigation.replace('Login')}>
-          <Text style={styles.link}>Already have an account? Login</Text>
+          <Text style={styles.link}>Back to Login</Text>
         </TouchableOpacity>
       </View>
     </View>

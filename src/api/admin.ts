@@ -1,13 +1,7 @@
-import API from './axios';
+// src/api/admin.ts
+import api from './axios';
 
-// ✅ GET ALL CLUBS
-export const getAllClubs = async () => {
-  const res = await API.get('/clubs');
-  return res.data;
-};
-
-// ✅ GET ALL CLUB ADMINS
 export const getAllClubAdmins = async () => {
-  const res = await API.get('/club-admin');
-  return res.data;
+  const res = await api.get('/club-admin');
+  return res.data?.data || res.data;
 };

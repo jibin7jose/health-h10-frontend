@@ -1,24 +1,16 @@
+// src/screens/Coach/CoachHome.tsx
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 import { useTheme } from '../../components/context/ThemeContext';
-import SidebarCoach from './SidebarCoach';
+import SidebarCoach from '../../components/Sidebar/SidebarCoach';
 import Navbar from '../../components/Navbar';
 
-const CoachHome = ({ navigation }: any) => {
+const CoachHome = () => {
   const { theme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  const toggleSidebar = () => {
-    setSidebarOpen(prev => !prev);
-  };
-
-  const handleLogoutRedirect = () => {
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Login' }],
-    });
-  };
+  const toggleSidebar = () => setSidebarOpen(prev => !prev);
 
   return (
     <View
@@ -28,10 +20,7 @@ const CoachHome = ({ navigation }: any) => {
       ]}
     >
       {sidebarOpen && (
-        <SidebarCoach
-          closeSidebar={toggleSidebar}
-          onLogout={handleLogoutRedirect}
-        />
+        <SidebarCoach closeSidebar={toggleSidebar} />
       )}
 
       <View style={styles.content}>
@@ -41,7 +30,6 @@ const CoachHome = ({ navigation }: any) => {
           sidebarOpen={sidebarOpen}
         />
 
-        {/* ✅ MAIN CONTENT */}
         <View style={styles.center}>
           <Text
             style={{
@@ -59,20 +47,9 @@ const CoachHome = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'row',
-  },
-
-  content: {
-    flex: 1,
-  },
-
-  center: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  container: { flex: 1, flexDirection: 'row' },
+  content: { flex: 1 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });
 
 export default CoachHome;

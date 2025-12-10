@@ -1,3 +1,4 @@
+// src/screens/ClubAdmin/AssignPodHolder.tsx
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -6,7 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import axios from '../../api/axios';
+import api from '../../api/axios';
 
 const AssignPodHolder = () => {
   const [coaches, setCoaches] = useState<any[]>([]);
@@ -20,11 +21,11 @@ const AssignPodHolder = () => {
 
   const loadData = async () => {
     try {
-      const coachRes = await axios.get('/coaches');
-      const podRes = await axios.get('/pod-holders');
+      const coachRes = await api.get('/coaches/my-club');
+      const podRes = await api.get('/pod-holders');
 
-      setCoaches(coachRes.data);
-      setPodHolders(podRes.data);
+      setCoaches(coachRes.data?.data || coachRes.data || []);
+      setPodHolders(podRes.data?.data || podRes.data || []);
     } catch (e) {
       Alert.alert('Error', 'Failed to load data');
     }
@@ -36,14 +37,18 @@ const AssignPodHolder = () => {
     }
 
     try {
-      await axios.post('/coaches/assign-pod-holder', {
+      await api.post('/coaches/assign-pod-holder', {
         coach_id: selectedCoach,
         pod_holder_id: selectedPodHolder,
       });
 
       Alert.alert('Success', 'Pod Holder assigned to Coach');
-    } catch (e) {
-      Alert.alert('Error', 'Assignment failed');
+    } catch (e: any) {
+      const msg =
+        e?.response?.data?.message ||
+        'Assignment failed';
+
+      Alert.alert('Error', msg);
     }
   };
 
@@ -61,7 +66,7 @@ const AssignPodHolder = () => {
           ]}
           onPress={() => setSelectedCoach(coach.coach_id)}
         >
-          <Text>{coach.coach_name}</Text>
+          <Text>{coach.coach_name || 'Unnamed Coach'}</Text>
         </TouchableOpacity>
       ))}
 
@@ -75,7 +80,7 @@ const AssignPodHolder = () => {
           ]}
           onPress={() => setSelectedPodHolder(pod.pod_holder_id)}
         >
-          <Text>{pod.name}</Text>
+          <Text>{pod.serial_number || 'Unknown Pod'}</Text>
         </TouchableOpacity>
       ))}
 
@@ -96,9 +101,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 6,
   },
-  selected: {
-    backgroundColor: '#BFDBFE',
-  },
+  selected: { backgroundColor: '#BFDBFE' },
   button: {
     marginTop: 20,
     backgroundColor: '#2563EB',
@@ -106,10 +109,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
   },
-  btnText: {
-    color: '#fff',
-    fontWeight: '700',
-  },
+  btnText: { color: '#fff', fontWeight: '700' },
 });
 
 export default AssignPodHolder;

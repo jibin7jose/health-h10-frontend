@@ -1,3 +1,4 @@
+// src/screens/ClubAdmin/CreateCoach.tsx
 import React, { useState } from 'react';
 import {
   View,
@@ -7,7 +8,7 @@ import {
   Text,
   TouchableOpacity,
 } from 'react-native';
-import axios from '../../api/axios';
+import api from '../../api/axios';
 
 const CreateCoach = () => {
   const [form, setForm] = useState({
@@ -27,12 +28,15 @@ const CreateCoach = () => {
     }
 
     try {
-      const res = await axios.post('/coaches', {
+      const payload = {
         coach_name: form.name,
         email: form.username,
         password: form.password,
-      });
+      };
 
+      console.log('✅ CREATE COACH PAYLOAD:', payload);
+
+      const res = await api.post('/coaches', payload);
       console.log('✅ CREATE COACH RESPONSE:', res.data);
 
       Alert.alert('Success', 'Coach created successfully');
@@ -46,20 +50,15 @@ const CreateCoach = () => {
     } catch (err: any) {
       const apiError = err?.response?.data;
 
-      console.log('❌ CREATE COACH ERROR FULL:', apiError);
+      console.log('❌ CREATE COACH ERROR FULL:', apiError || err);
 
       let message = 'Failed to create coach';
 
-      // ✅ If backend sends validation object
       if (typeof apiError?.message === 'object') {
         message = Object.values(apiError.message).join('\n');
-      }
-      // ✅ If backend sends normal string message
-      else if (typeof apiError?.message === 'string') {
+      } else if (typeof apiError?.message === 'string') {
         message = apiError.message;
-      }
-      // ✅ Fallback
-      else if (err?.message) {
+      } else if (err?.message) {
         message = err.message;
       }
 

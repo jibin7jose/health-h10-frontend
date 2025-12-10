@@ -1,3 +1,4 @@
+// src/components/context/ThemeContext.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Appearance } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,7 +19,6 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const systemTheme = Appearance.getColorScheme() as ThemeType;
-
   const [theme, setTheme] = useState<ThemeType>(systemTheme || 'dark');
 
   useEffect(() => {

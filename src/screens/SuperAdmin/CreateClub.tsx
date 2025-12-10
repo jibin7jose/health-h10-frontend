@@ -1,3 +1,4 @@
+// src/screens/SuperAdmin/CreateClub.tsx
 import React, { useEffect, useState } from 'react';
 import {
   View,
@@ -9,7 +10,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import API from '../../api/axios';
+import api from '../../api/axios';
 import { createClub } from '../../api/clubs';
 
 const CreateClub = () => {
@@ -26,23 +27,18 @@ const CreateClub = () => {
   const [podHolders, setPodHolders] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // ===========================
-  // LOAD POD HOLDERS
-  // ===========================
   useEffect(() => {
     loadPodHolders();
   }, []);
 
   const loadPodHolders = async () => {
     try {
-      const res = await API.get('/pod-holders');
-
+      const res = await api.get('/pod-holders');
       const list = Array.isArray(res.data)
         ? res.data
         : Array.isArray(res.data?.data)
         ? res.data.data
         : [];
-
       setPodHolders(list);
     } catch (err) {
       console.log('❌ POD HOLDER LOAD ERROR:', err);
@@ -51,9 +47,6 @@ const CreateClub = () => {
     }
   };
 
-  // ===========================
-  // CREATE CLUB + ADMIN
-  // ===========================
   const handleCreate = async () => {
     if (
       !clubName.trim() ||
@@ -78,11 +71,9 @@ const CreateClub = () => {
         club_name: clubName,
         address,
         sport,
-
         admin_name: adminName,
         admin_email: adminEmail,
         admin_password: adminPassword,
-
         pod_holder_id: podHolder || null,
       };
 
@@ -90,10 +81,8 @@ const CreateClub = () => {
 
       await createClub(payload);
 
-      // ✅✅✅ ONLY STRING → NO CRASH
       Alert.alert('Success', 'Club & Admin Created Successfully');
 
-      // RESET FORM
       setClubName('');
       setAddress('');
       setSport('');
@@ -110,16 +99,12 @@ const CreateClub = () => {
           ? err.response.data.message
           : 'Server error while creating club';
 
-      // ✅✅✅ FORCE STRING ONLY
       Alert.alert('Error', safeMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  // ===========================
-  // UI
-  // ===========================
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Create Club</Text>
@@ -184,7 +169,6 @@ const CreateClub = () => {
       <View style={styles.pickerBox}>
         <Picker selectedValue={podHolder} onValueChange={setPodHolder}>
           <Picker.Item label="Select Pod Holder" value="" />
-
           {Array.isArray(podHolders) &&
             podHolders.map((p: any) => (
               <Picker.Item
@@ -209,22 +193,10 @@ const CreateClub = () => {
   );
 };
 
-// ===========================
 const styles = StyleSheet.create({
   container: { padding: 20, paddingBottom: 60 },
-
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    marginBottom: 20,
-  },
-
-  sectionTitle: {
-    fontWeight: '700',
-    marginTop: 20,
-    marginBottom: 8,
-  },
-
+  title: { fontSize: 22, fontWeight: '700', marginBottom: 20 },
+  sectionTitle: { fontWeight: '700', marginTop: 20, marginBottom: 8 },
   input: {
     borderWidth: 1,
     borderColor: '#CBD5E1',
@@ -232,21 +204,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 10,
   },
-
   pickerBox: {
     borderWidth: 1,
     borderColor: '#CBD5E1',
     borderRadius: 8,
     marginBottom: 10,
   },
-
   btn: {
     backgroundColor: '#2563EB',
     padding: 16,
     borderRadius: 10,
     marginTop: 20,
   },
-
   btnText: {
     color: '#fff',
     fontWeight: '700',

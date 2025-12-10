@@ -1,23 +1,30 @@
+// src/navigation/AppNavigator.tsx
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { STORAGE_KEYS } from '../utils/constants';
 
-import LoginScreen from '../screens/LoginScreen';
-import RegisterScreen from '../screens/RegisterScreen';
+import LoginScreen from '../screens/Auth/LoginScreen';
+import RegisterScreen from '../screens/Auth/RegisterScreen';
+import ForgotPassword from '../screens/Auth/ForgotPassword';
+import ResetPassword from '../screens/Auth/ResetPassword';
+
 import SuperAdminHome from '../screens/SuperAdmin/SuperAdminHome';
 import ClubAdminHome from '../screens/ClubAdmin/ClubAdminHome';
-import CoachHome from '../screens/Coach/CoachHome'; // ✅ ✅ ✅ ADD THIS
+import CoachHome from '../screens/Coach/CoachHome';
 
-// ✅ ✅ ✅ ADD COACH HERE
 export type RootStackParamList = {
-  Register: undefined;
   Login: undefined;
+  Register: undefined;
+  ForgotPassword: undefined;
+  ResetPassword: undefined;
+
   SuperAdminHome: undefined;
   ClubAdminHome: undefined;
-  CoachHome: undefined; // ✅ REQUIRED
+  CoachHome: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -34,14 +41,11 @@ const AppNavigator = () => {
 
       if (token && role === 'SUPER_ADMIN') {
         setInitialRoute('SuperAdminHome');
-      }
-      else if (token && role === 'CLUB_ADMIN') {
+      } else if (token && role === 'CLUB_ADMIN') {
         setInitialRoute('ClubAdminHome');
-      }
-      else if (token && role === 'COACH') {
-        setInitialRoute('CoachHome'); // ✅ ✅ ✅ THIS WAS MISSING
-      }
-      else {
+      } else if (token && role === 'COACH') {
+        setInitialRoute('CoachHome');
+      } else {
         setInitialRoute('Login');
       }
 
@@ -65,24 +69,18 @@ const AppNavigator = () => {
         initialRouteName={initialRoute}
         screenOptions={{ headerShown: false }}
       >
-        <Stack.Screen name="Register" component={RegisterScreen} />
+        {/* ✅ AUTH */}
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+        <Stack.Screen name="ResetPassword" component={ResetPassword} />
 
-        <Stack.Screen
-          name="SuperAdminHome"
-          component={SuperAdminHome}
-        />
+        {/* ✅ SUPER ADMIN ONLY */}
+        <Stack.Screen name="Register" component={RegisterScreen} />
 
-        <Stack.Screen
-          name="ClubAdminHome"
-          component={ClubAdminHome}
-        />
-
-        {/* ✅ ✅ ✅ THIS FIXES YOUR LOGIN RESET ERROR */}
-        <Stack.Screen
-          name="CoachHome"
-          component={CoachHome}
-        />
+        {/* ✅ ROLE DASHBOARDS */}
+        <Stack.Screen name="SuperAdminHome" component={SuperAdminHome} />
+        <Stack.Screen name="ClubAdminHome" component={ClubAdminHome} />
+        <Stack.Screen name="CoachHome" component={CoachHome} />
       </Stack.Navigator>
     </NavigationContainer>
   );

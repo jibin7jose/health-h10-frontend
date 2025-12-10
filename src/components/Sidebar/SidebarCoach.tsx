@@ -1,14 +1,17 @@
+// src/components/Sidebar/SidebarCoach.tsx
 import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
 
 import { STORAGE_KEYS } from '../../utils/constants';
-import { useTheme } from '../../components/context/ThemeContext';
+import { useTheme } from '../context/ThemeContext';
 
-const SidebarCoach = ({ closeSidebar, onLogout }: any) => {
+const SidebarCoach = ({ closeSidebar }: any) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const navigation = useNavigation<any>();
 
   const handleLogout = async () => {
     await AsyncStorage.multiRemove([
@@ -17,7 +20,10 @@ const SidebarCoach = ({ closeSidebar, onLogout }: any) => {
       STORAGE_KEYS.USER_NAME,
     ]);
 
-    onLogout(); // ✅ redirect after logout
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Login' }],
+    });
   };
 
   return (
@@ -27,7 +33,6 @@ const SidebarCoach = ({ closeSidebar, onLogout }: any) => {
         { backgroundColor: isDark ? '#050816' : '#F1F5F9' },
       ]}
     >
-      {/* ✅ HEADER */}
       <View style={styles.topRow}>
         <Text
           style={[
@@ -49,7 +54,6 @@ const SidebarCoach = ({ closeSidebar, onLogout }: any) => {
 
       <View style={{ flex: 1 }} />
 
-      {/* ✅ LOGOUT */}
       <TouchableOpacity style={styles.logout} onPress={handleLogout}>
         <Text
           style={[

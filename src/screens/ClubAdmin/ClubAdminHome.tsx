@@ -1,39 +1,46 @@
+// src/screens/ClubAdmin/ClubAdminHome.tsx
+
 import React, { useState } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 
-import SidebarClubAdmin from './SidebarClubAdmin';
-import Navbar from '../../components/Navbar';
+import SidebarClubAdmin from '../../components/Sidebar/SidebarClubAdmin';
+import ClubAdminNavbar from '../../components/Navbar/ClubAdminNavbar';
+
 import { useTheme } from '../../components/context/ThemeContext';
 
 import CreateCoach from './CreateCoach';
+import MyClubCoaches from './MyClubCoaches';
 
-type ScreenType = 'Home' | 'CreateCoach';
+type ScreenType = 'Home' | 'CreateCoach' | 'MyClubCoaches';
 
 const ClubAdminHome = () => {
   const { theme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [active, setActive] = useState<ScreenType>('Home');
 
-  const toggleSidebar = () => {
-    setSidebarOpen(prev => !prev);
-  };
+  const toggleSidebar = () => setSidebarOpen(prev => !prev);
 
   const renderScreen = () => {
-    if (active === 'CreateCoach') return <CreateCoach />;
-
-    return (
-      <View style={styles.center}>
-        <Text
-          style={{
-            fontSize: 20,
-            fontWeight: '700',
-            color: theme === 'dark' ? '#E5E7EB' : '#020617',
-          }}
-        >
-          Welcome Club Admin
-        </Text>
-      </View>
-    );
+    switch (active) {
+      case 'CreateCoach':
+        return <CreateCoach />;
+      case 'MyClubCoaches':
+        return <MyClubCoaches />;
+      default:
+        return (
+          <View style={styles.center}>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: '700',
+                color: theme === 'dark' ? '#E5E7EB' : '#020617',
+              }}
+            >
+              Welcome Club Admin
+            </Text>
+          </View>
+        );
+    }
   };
 
   return (
@@ -52,7 +59,8 @@ const ClubAdminHome = () => {
       )}
 
       <View style={styles.content}>
-        <Navbar
+        {/* ✅✅✅ FIX IS HERE */}
+        <ClubAdminNavbar
           title={active}
           toggleSidebar={toggleSidebar}
           sidebarOpen={sidebarOpen}
@@ -65,9 +73,18 @@ const ClubAdminHome = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, flexDirection: 'row' },
-  content: { flex: 1 },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  container: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  content: {
+    flex: 1,
+  },
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
 
-export default ClubAdminHome;
+export default ClubAdminHome; // ✅ REQUIRED

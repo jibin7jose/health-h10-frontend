@@ -1,13 +1,19 @@
+// src/components/CustomButton.tsx
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
 interface Props {
   title: string;
   onPress: () => void;
+  disabled?: boolean;
 }
 
-const CustomButton: React.FC<Props> = ({ title, onPress }) => (
-  <TouchableOpacity style={styles.button} onPress={onPress}>
+const CustomButton: React.FC<Props> = ({ title, onPress, disabled }) => (
+  <TouchableOpacity
+    style={[styles.button, disabled && { opacity: 0.7 }]}
+    onPress={onPress}
+    disabled={disabled}
+  >
     <Text style={styles.text}>{title}</Text>
   </TouchableOpacity>
 );

@@ -2,12 +2,14 @@ import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
 
 import { STORAGE_KEYS } from '../../utils/constants';
-import { useTheme } from '../../components/context/ThemeContext';
+import { useTheme } from '../context/ThemeContext';
 
 const SidebarClubAdmin = ({ active, setActive, closeSidebar }: any) => {
   const { theme } = useTheme();
+  const navigation = useNavigation<any>();
   const isDark = theme === 'dark';
 
   const handleLogout = async () => {
@@ -16,6 +18,11 @@ const SidebarClubAdmin = ({ active, setActive, closeSidebar }: any) => {
       STORAGE_KEYS.ROLE,
       STORAGE_KEYS.USER_NAME,
     ]);
+
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Login' }],
+    });
   };
 
   const getItemStyle = (key: string) => ({
@@ -24,7 +31,14 @@ const SidebarClubAdmin = ({ active, setActive, closeSidebar }: any) => {
   });
 
   const getTextStyle = (key: string) => ({
-    color: active === key ? '#000000' : isDark ? '#E5E7EB' : '#020617',
+    color:
+      active === key
+        ? isDark
+          ? '#FFFFFF'
+          : '#000000'
+        : isDark
+        ? '#E5E7EB'
+        : '#020617',
     fontWeight: active === key ? '700' : '500',
   });
 
@@ -35,7 +49,6 @@ const SidebarClubAdmin = ({ active, setActive, closeSidebar }: any) => {
         { backgroundColor: isDark ? '#050816' : '#F1F5F9' },
       ]}
     >
-      {/* HEADER */}
       <View style={styles.topRow}>
         <Text style={[styles.title, { color: isDark ? '#E5E7EB' : '#020617' }]}>
           Club Admin
@@ -50,7 +63,6 @@ const SidebarClubAdmin = ({ active, setActive, closeSidebar }: any) => {
         </TouchableOpacity>
       </View>
 
-      {/* DASHBOARD */}
       <TouchableOpacity
         style={[styles.item, getItemStyle('Home')]}
         onPress={() => setActive('Home')}
@@ -60,7 +72,6 @@ const SidebarClubAdmin = ({ active, setActive, closeSidebar }: any) => {
         </Text>
       </TouchableOpacity>
 
-      {/* CREATE COACH */}
       <TouchableOpacity
         style={[styles.item, getItemStyle('CreateCoach')]}
         onPress={() => setActive('CreateCoach')}
@@ -70,14 +81,22 @@ const SidebarClubAdmin = ({ active, setActive, closeSidebar }: any) => {
         </Text>
       </TouchableOpacity>
 
+      <TouchableOpacity
+        style={[styles.item, getItemStyle('MyClubCoaches')]}
+        onPress={() => setActive('MyClubCoaches')}
+      >
+        <Text style={[styles.itemText, getTextStyle('MyClubCoaches')]}>
+          My Club Coaches
+        </Text>
+      </TouchableOpacity>
+
       <View style={{ flex: 1 }} />
 
-      {/* LOGOUT */}
       <TouchableOpacity style={styles.logout} onPress={handleLogout}>
         <Text
           style={[
             styles.logoutText,
-            { color: isDark ? '#F97373' : '#DC2626' },
+            { color: isDark ? '#F87171' : '#DC2626' },
           ]}
         >
           Logout
