@@ -1,62 +1,132 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Alert } from 'react-native';
-import CustomButton from '../../components/CustomButton';
-import { forgotPassword } from '../../api/auth';
+// src/screens/Auth/ForgotPassword.tsx
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Alert,
+  ImageBackground,
+  TouchableOpacity,
+} from "react-native";
+import CustomButton from "../../components/CustomButton";
+import { forgotPassword } from "../../api/auth";
 
 const ForgotPassword = ({ navigation }: any) => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
 
   const handleSubmit = async () => {
-    if (!email) return Alert.alert('Error', 'Enter email');
+    if (!email) return Alert.alert("Error", "Enter email");
 
     try {
       await forgotPassword(email);
 
       Alert.alert(
-        'Success',
-        'If an account with this email exists, a reset code was sent.',
+        "Success",
+        "If an account with this email exists, a reset code was sent.",
         [
           {
-            text: 'OK',
-            onPress: () => navigation.navigate('ResetPassword'),
+            text: "OK",
+            onPress: () => navigation.navigate("ResetPassword"),
           },
-        ],
+        ]
       );
     } catch {
-      Alert.alert('Error', 'Something went wrong');
+      Alert.alert("Error", "Something went wrong");
     }
   };
 
   return (
-    <View style={styles.root}>
-      <View style={styles.card}>
-        <Text style={styles.heading}>Forgot Password</Text>
+    <ImageBackground
+      source={require("../../assets/loginbackground.png")}
+      style={styles.bg}
+      resizeMode="cover"
+    >
+      <View style={styles.overlay} />
 
-        <TextInput
-          placeholder="Email"
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          placeholderTextColor="#9CA3AF"
-          autoCapitalize="none"
-        />
+      <View style={styles.root}>
+        <View style={styles.card}>
+          <Text style={styles.heading}>Forgot Password</Text>
+          <Text style={styles.subtitle}>
+            Enter your email to receive reset instructions
+          </Text>
 
-        <CustomButton title="Submit" onPress={handleSubmit} />
+          <TextInput
+            placeholder="Email"
+            style={styles.input}
+            value={email}
+            onChangeText={setEmail}
+            placeholderTextColor="#ddd"
+            autoCapitalize="none"
+          />
 
-        <Text style={styles.link} onPress={() => navigation.replace('Login')}>
-          Back to Login
-        </Text>
+          <CustomButton title="Submit" onPress={handleSubmit} />
+
+          <TouchableOpacity onPress={() => navigation.replace("Login")}>
+            <Text style={styles.link}>← Back to Login</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#0A0F1F', justifyContent: 'center', paddingHorizontal: 28 },
-  card: { backgroundColor: '#0F1629', padding: 28, borderRadius: 14, borderWidth: 1, borderColor: '#1E293B' },
-  heading: { color: '#F8FAFC', fontSize: 22, fontWeight: '700', marginBottom: 16 },
-  input: { backgroundColor: '#020617', borderWidth: 1, borderColor: '#1E293B', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, color: '#E5E7EB', marginTop: 14 },
-  link: { color: '#60A5FA', textAlign: 'center', marginTop: 16 },
+  bg: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.55)",
+  },
+
+  root: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+  },
+
+  card: {
+    width: "100%",
+    maxWidth: 420, // Same fixed size as Login / Register / Reset
+    backgroundColor: "rgba(255,255,255,0.08)",
+    padding: 26,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.2)",
+  },
+
+  heading: {
+    color: "#fff",
+    fontSize: 26,
+    fontWeight: "700",
+  },
+
+  subtitle: {
+    color: "#ddd",
+    marginTop: 8,
+    marginBottom: 20,
+    fontSize: 14,
+  },
+
+  input: {
+    backgroundColor: "rgba(255,255,255,0.1)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.25)",
+    borderRadius: 10,
+    padding: 12,
+    color: "#fff",
+    marginTop: 14,
+  },
+
+  link: {
+    color: "#fff",
+    textAlign: "center",
+    marginTop: 16,
+    textDecorationLine: "underline",
+  },
 });
 
 export default ForgotPassword;

@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
+  ImageBackground,
 } from "react-native";
 
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -29,7 +30,6 @@ export default function LoginScreen({ navigation }: any) {
   const [timer, setTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
 
-  // track mount for safe alerts
   const mounted = useRef(true);
   useEffect(() => {
     return () => {
@@ -37,7 +37,6 @@ export default function LoginScreen({ navigation }: any) {
     };
   }, []);
 
-  // safe alert wrapper (avoids "not attached to activity")
   const safeAlert = (title: string, msg: string) => {
     requestAnimationFrame(() => {
       if (mounted.current && navigation.isFocused()) {
@@ -89,16 +88,12 @@ export default function LoginScreen({ navigation }: any) {
     });
   };
 
-  // ---------- LOGIN (SEND OTP) ----------
   const handleLogin = async () => {
     if (!email || !password)
       return safeAlert("Error", "Email & Password are required");
 
     if (!isValidEmail(email))
-      return safeAlert(
-        "Invalid Email",
-        "Enter a valid email (example@gmail.com)"
-      );
+      return safeAlert("Invalid Email", "Enter a valid email");
 
     try {
       setLoading(true);
@@ -115,19 +110,14 @@ export default function LoginScreen({ navigation }: any) {
 
       safeAlert("Error", "Unexpected server response");
     } catch (err: any) {
-      // <-- NEW: map common auth failures to a single friendly message
       const status = err?.response?.status;
-      const serverMsg = getErrorMessage(err).toLowerCase();
+      const msg = getErrorMessage(err).toLowerCase();
 
-      const indicatesInvalidCred =
+      if (
         status === 401 ||
-        serverMsg.includes("user not found") ||
-        serverMsg.includes("invalid password") ||
-        serverMsg.includes("invalid credentials") ||
-        serverMsg.includes("invalid username") ||
-        serverMsg.includes("invalid email or password");
-
-      if (indicatesInvalidCred) {
+        msg.includes("invalid") ||
+        msg.includes("not found")
+      ) {
         safeAlert("Invalid Credentials", "Invalid username or password");
       } else {
         safeAlert("Login Failed", getErrorMessage(err));
@@ -137,22 +127,21 @@ export default function LoginScreen({ navigation }: any) {
     }
   };
 
-  // ---------- VERIFY OTP ----------
   const handleVerifyOtp = async () => {
-    if (!otp.trim()) return safeAlert("Error", "Please enter the OTP");
+    if (!otp.trim()) return safeAlert("Error", "Please enter OTP");
 
     try {
       setLoading(true);
       const res = await verifyLoginOtp({ email, otp });
 
-      if (!res?.access_token) return safeAlert("Error", "Invalid login response");
+      if (!res?.access_token)
+        return safeAlert("Error", "Invalid login response");
 
       await saveSession(res);
     } catch (err: any) {
-      // if server says user not found / invalid OTP -> show helpful message
-      const serverMsg = getErrorMessage(err).toLowerCase();
-      if (serverMsg.includes("invalid") || serverMsg.includes("expired")) {
-        safeAlert("OTP Error", "OTP is invalid or expired");
+      const msg = getErrorMessage(err).toLowerCase();
+      if (msg.includes("invalid") || msg.includes("expired")) {
+        safeAlert("OTP Error", "OTP invalid or expired");
       } else {
         safeAlert("OTP Error", getErrorMessage(err));
       }
@@ -161,7 +150,6 @@ export default function LoginScreen({ navigation }: any) {
     }
   };
 
-  // ---------- RESEND OTP ----------
   const handleResendOtp = async () => {
     if (!canResend) return;
 
@@ -170,7 +158,7 @@ export default function LoginScreen({ navigation }: any) {
       if (res.needOtp) {
         setTimer(30);
         setCanResend(false);
-        safeAlert("OTP Resent", "A new OTP has been sent to your email");
+        safeAlert("OTP Resent", "New OTP sent");
       }
     } catch (err: any) {
       safeAlert("Error", getErrorMessage(err));
@@ -178,176 +166,192 @@ export default function LoginScreen({ navigation }: any) {
   };
 
   return (
-    <View style={styles.root}>
-      <View style={styles.card}>
-        <Text style={styles.heading}>Welcome Back 👋</Text>
-        <Text style={styles.subtitle}>
-          {otpStep ? "Enter your OTP" : "Login to continue"}
-        </Text>
+    <ImageBackground
+      source={require("../../assets/loginbackground.png")}
+      style={styles.bg}
+      resizeMode="cover"
+    >
+      <View style={styles.overlay} />
 
-        {/* EMAIL */}
-        <TextInput
-          placeholder="Email"
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          placeholderTextColor="#9CA3AF"
-          editable={!otpStep}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
+      <View style={styles.root}>
+        <View style={styles.card}>
+          <Text style={styles.heading}>Welcome Back 👋</Text>
+          <Text style={styles.subtitle}>
+            {otpStep ? "Enter your OTP" : "Login to continue"}
+          </Text>
 
-        {/* PASSWORD */}
-        {!otpStep && (
-          <>
-            <View style={styles.passwordRow}>
-              <TextInput
-                placeholder="Password"
-                secureTextEntry={!showPassword}
-                style={styles.passwordInput}
-                value={password}
-                onChangeText={setPassword}
-                placeholderTextColor="#9CA3AF"
-              />
-              <TouchableOpacity
-                onPress={() => setShowPassword(!showPassword)}
-                style={styles.iconBtn}
-              >
-                <Ionicons
-                  name={showPassword ? "eye-outline" : "eye-off-outline"}
-                  size={22}
-                  color="#9CA3AF"
+          {/* EMAIL */}
+          <TextInput
+            placeholder="Email"
+            style={styles.input}
+            value={email}
+            onChangeText={setEmail}
+            placeholderTextColor="#ddd"
+            editable={!otpStep}
+            autoCapitalize="none"
+          />
+
+          {!otpStep && (
+            <>
+              <View style={styles.passwordRow}>
+                <TextInput
+                  placeholder="Password"
+                  secureTextEntry={!showPassword}
+                  style={styles.passwordInput}
+                  value={password}
+                  onChangeText={setPassword}
+                  placeholderTextColor="#ccc"
                 />
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity
+                  onPress={() => setShowPassword(!showPassword)}
+                  style={styles.iconBtn}
+                >
+                  <Ionicons
+                    name={showPassword ? "eye-outline" : "eye-off-outline"}
+                    size={22}
+                    color="#ccc"
+                  />
+                </TouchableOpacity>
+              </View>
 
-            <TouchableOpacity
-              onPress={() => navigation.navigate("ForgotPassword")}
-            >
-              <Text style={styles.forgot}>Forgot Password?</Text>
-            </TouchableOpacity>
-
-            <CustomButton
-              title={loading ? "Please wait..." : "Login"}
-              onPress={handleLogin}
-            />
-          </>
-        )}
-
-        {/* OTP STEP */}
-        {otpStep && (
-          <>
-            <TextInput
-              placeholder="Enter OTP"
-              style={styles.input}
-              value={otp}
-              onChangeText={setOtp}
-              maxLength={6}
-              keyboardType="number-pad"
-              placeholderTextColor="#9CA3AF"
-            />
-
-            <TouchableOpacity onPress={handleResendOtp} disabled={!canResend}>
-              <Text
-                style={[
-                  styles.resendText,
-                  { color: canResend ? "#60A5FA" : "#475569" },
-                ]}
+              <TouchableOpacity
+                onPress={() => navigation.navigate("ForgotPassword")}
               >
-                {canResend ? "Resend OTP" : `Resend in ${timer}s`}
-              </Text>
-            </TouchableOpacity>
+                <Text style={styles.forgot}>Forgot Password?</Text>
+              </TouchableOpacity>
 
-            <CustomButton
-              title={loading ? "Please wait..." : "Verify OTP"}
-              onPress={handleVerifyOtp}
-            />
+              <CustomButton
+                title={loading ? "Please wait..." : "Login"}
+                onPress={handleLogin}
+              />
+            </>
+          )}
 
-            <TouchableOpacity
-              onPress={() => {
-                setOtp("");
-                setOtpStep(false);
-                setTimer(30);
-                setCanResend(false);
-              }}
-              style={styles.backBtnBottom}
-            >
-              <Text style={styles.backTextBottom}>← Back to Login</Text>
-            </TouchableOpacity>
-          </>
-        )}
+          {otpStep && (
+            <>
+              <TextInput
+                placeholder="Enter OTP"
+                style={styles.input}
+                value={otp}
+                onChangeText={setOtp}
+                keyboardType="number-pad"
+                maxLength={6}
+                placeholderTextColor="#ddd"
+              />
+
+              <TouchableOpacity
+                onPress={handleResendOtp}
+                disabled={!canResend}
+              >
+                <Text
+                  style={[
+                    styles.resendText,
+                    { color: canResend ? "#fff" : "#999" },
+                  ]}
+                >
+                  {canResend ? "Resend OTP" : `Resend in ${timer}s`}
+                </Text>
+              </TouchableOpacity>
+
+              <CustomButton
+                title={loading ? "Please wait..." : "Verify OTP"}
+                onPress={handleVerifyOtp}
+              />
+
+              <TouchableOpacity
+                onPress={() => {
+                  setOtp("");
+                  setOtpStep(false);
+                  setTimer(30);
+                  setCanResend(false);
+                }}
+              >
+                <Text style={styles.backText}>← Back to Login</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
       </View>
-    </View>
+    </ImageBackground>
   );
 }
 
-// -------------------- STYLES --------------------
 const styles = StyleSheet.create({
-  root: {
+  bg: {
     flex: 1,
-    backgroundColor: "#0A0F1F",
     justifyContent: "center",
-    paddingHorizontal: 28,
   },
-  card: {
-    backgroundColor: "#0F1629",
-    padding: 28,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: "#1E293B",
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.55)",
   },
+root: {
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "center", // ⭐ centers the card horizontally
+  paddingHorizontal: 24,
+},
+
+card: {
+  width: "100%",
+  maxWidth: 420,          // ⭐ fixes login box size (like web form)
+  backgroundColor: "rgba(255,255,255,0.08)",
+  padding: 26,
+  borderRadius: 14,
+  borderWidth: 1,
+  borderColor: "rgba(255,255,255,0.2)",
+},
+
   heading: {
-    color: "#F8FAFC",
     fontSize: 26,
+    color: "#fff",
     fontWeight: "700",
   },
   subtitle: {
-    color: "#94A3B8",
+    color: "#ddd",
     marginVertical: 12,
   },
   input: {
-    backgroundColor: "#020617",
+    backgroundColor: "rgba(255,255,255,0.1)",
     borderWidth: 1,
-    borderColor: "#1E293B",
+    borderColor: "rgba(255,255,255,0.25)",
     borderRadius: 10,
     padding: 12,
-    color: "#E5E7EB",
+    color: "#fff",
     marginTop: 14,
   },
   passwordRow: {
-    backgroundColor: "#020617",
+    backgroundColor: "rgba(255,255,255,0.1)",
     borderWidth: 1,
-    borderColor: "#1E293B",
+    borderColor: "rgba(255,255,255,0.25)",
     borderRadius: 10,
-    paddingHorizontal: 12,
-    marginTop: 14,
     flexDirection: "row",
     alignItems: "center",
+    paddingHorizontal: 12,
+    marginTop: 14,
   },
   passwordInput: {
     flex: 1,
-    color: "#E5E7EB",
+    color: "#fff",
     paddingVertical: 12,
   },
   iconBtn: {
     paddingLeft: 10,
   },
   forgot: {
-    color: "#60A5FA",
+    color: "#fff",
     textAlign: "right",
     marginTop: 8,
+    textDecorationLine: "underline",
   },
   resendText: {
     textAlign: "center",
     marginTop: 10,
-    fontSize: 14,
   },
-  backBtnBottom: {
+  backText: {
+    textAlign: "center",
     marginTop: 14,
-    alignSelf: "center",
-  },
-  backTextBottom: {
-    color: "#60A5FA",
-    fontSize: 15,
+    color: "#fff",
+    textDecorationLine: "underline",
   },
 });

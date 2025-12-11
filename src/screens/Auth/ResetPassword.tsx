@@ -1,22 +1,29 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity } from 'react-native';
-import CustomButton from '../../components/CustomButton';
-import { resetPassword } from '../../api/auth';
+// src/screens/Auth/ResetPassword.tsx
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+  ImageBackground,
+} from "react-native";
+import CustomButton from "../../components/CustomButton";
+import { resetPassword } from "../../api/auth";
 
 const ResetPassword = ({ navigation }: any) => {
-  const [token, setToken] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [token, setToken] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleReset = async () => {
-    console.log('✅ TOKEN FROM INPUT:', `"${token}"`);
-
     if (!token || !password || !confirmPassword) {
-      return Alert.alert('Error', 'All fields are required');
+      return Alert.alert("Error", "All fields are required");
     }
 
     if (password !== confirmPassword) {
-      return Alert.alert('Error', 'Passwords do not match');
+      return Alert.alert("Error", "Passwords do not match");
     }
 
     try {
@@ -25,107 +32,125 @@ const ResetPassword = ({ navigation }: any) => {
         password,
       });
 
-      Alert.alert('Success', 'Password updated successfully', [
-        { text: 'OK', onPress: () => navigation.replace('Login') },
+      Alert.alert("Success", "Password updated successfully", [
+        { text: "OK", onPress: () => navigation.replace("Login") },
       ]);
     } catch (err: any) {
-      console.log('❌ RESET ERROR:', err?.response?.data || err);
-
       const msg =
-        typeof err?.response?.data?.message === 'string'
+        typeof err?.response?.data?.message === "string"
           ? err.response.data.message
-          : 'Invalid or expired token';
+          : "Invalid or expired token";
 
-      Alert.alert('Error', msg);
+      Alert.alert("Error", msg);
     }
   };
 
   return (
-    <View style={styles.root}>
-      <View style={styles.card}>
-        <Text style={styles.heading}>Reset Password</Text>
+    <ImageBackground
+      source={require("../../assets/loginbackground.png")}
+      style={styles.bg}
+      resizeMode="cover"
+    >
+      <View style={styles.overlay} />
 
-        <TextInput
-          placeholder="Verification Code"
-          value={token}
-          onChangeText={setToken}
-          style={styles.input}
-          placeholderTextColor="#9CA3AF"
-          autoCapitalize="characters"
-        />
+      <View style={styles.root}>
+        <View style={styles.card}>
+          <Text style={styles.heading}>Reset Password</Text>
 
-        <TextInput
-          placeholder="New Password"
-          value={password}
-          onChangeText={setPassword}
-          style={styles.input}
-          secureTextEntry
-          placeholderTextColor="#9CA3AF"
-        />
+          <TextInput
+            placeholder="Verification Code"
+            value={token}
+            onChangeText={setToken}
+            style={styles.input}
+            placeholderTextColor="#ddd"
+            autoCapitalize="characters"
+          />
 
-        <TextInput
-          placeholder="Confirm New Password"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          style={styles.input}
-          secureTextEntry
-          placeholderTextColor="#9CA3AF"
-        />
+          <TextInput
+            placeholder="New Password"
+            value={password}
+            onChangeText={setPassword}
+            style={styles.input}
+            secureTextEntry
+            placeholderTextColor="#ddd"
+          />
 
-        <CustomButton title="Reset Password" onPress={handleReset} />
+          <TextInput
+            placeholder="Confirm New Password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            style={styles.input}
+            secureTextEntry
+            placeholderTextColor="#ddd"
+          />
 
-        {/* 🔙 BACK TO LOGIN BUTTON */}
-        <TouchableOpacity
-          onPress={() => navigation.replace('Login')}
-          style={styles.backBtn}
-        >
-          <Text style={styles.backText}>← Back to Login</Text>
-        </TouchableOpacity>
+          <CustomButton title="Reset Password" onPress={handleReset} />
+
+          <TouchableOpacity
+            onPress={() => navigation.replace("Login")}
+            style={styles.backBtn}
+          >
+            <Text style={styles.backText}>← Back to Login</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
+  bg: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.55)",
+  },
+
   root: {
     flex: 1,
-    backgroundColor: '#0A0F1F',
-    justifyContent: 'center',
-    paddingHorizontal: 28,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
   },
+
   card: {
-    backgroundColor: '#0F1629',
-    padding: 28,
+    width: "100%",
+    maxWidth: 420, // same as Login & Register
+    backgroundColor: "rgba(255,255,255,0.08)",
+    padding: 26,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#1E293B',
+    borderColor: "rgba(255,255,255,0.2)",
   },
+
   heading: {
-    color: '#F8FAFC',
-    fontSize: 22,
-    fontWeight: '700',
+    color: "#fff",
+    fontSize: 26,
+    fontWeight: "700",
     marginBottom: 16,
   },
+
   input: {
-    backgroundColor: '#020617',
+    backgroundColor: "rgba(255,255,255,0.1)",
     borderWidth: 1,
-    borderColor: '#1E293B',
+    borderColor: "rgba(255,255,255,0.25)",
     borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    color: '#E5E7EB',
+    padding: 12,
+    color: "#fff",
     marginTop: 14,
   },
 
-  // BACK BUTTON STYLES
   backBtn: {
     marginTop: 16,
-    alignSelf: 'center',
+    alignSelf: "center",
   },
+
   backText: {
-    color: '#60A5FA',
+    color: "#fff",
     fontSize: 15,
-    fontWeight: '500',
+    textDecorationLine: "underline",
   },
 });
 
