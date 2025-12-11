@@ -1,4 +1,3 @@
-// src/navigation/AppNavigator.tsx
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -65,19 +64,11 @@ const AppNavigator = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName={initialRoute}
-        screenOptions={{ headerShown: false }}
-      >
-        {/* ✅ AUTH */}
+      <Stack.Navigator initialRouteName={initialRoute} screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
         <Stack.Screen name="ResetPassword" component={ResetPassword} />
-
-        {/* ✅ SUPER ADMIN ONLY */}
         <Stack.Screen name="Register" component={RegisterScreen} />
-
-        {/* ✅ ROLE DASHBOARDS */}
         <Stack.Screen name="SuperAdminHome" component={SuperAdminHome} />
         <Stack.Screen name="ClubAdminHome" component={ClubAdminHome} />
         <Stack.Screen name="CoachHome" component={CoachHome} />

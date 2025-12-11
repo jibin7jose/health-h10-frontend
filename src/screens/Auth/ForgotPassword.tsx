@@ -1,4 +1,3 @@
-// src/screens/Auth/ForgotPassword.tsx
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Alert } from 'react-native';
 import CustomButton from '../../components/CustomButton';
@@ -39,14 +38,12 @@ const ForgotPassword = ({ navigation }: any) => {
           value={email}
           onChangeText={setEmail}
           placeholderTextColor="#9CA3AF"
+          autoCapitalize="none"
         />
 
         <CustomButton title="Submit" onPress={handleSubmit} />
 
-        <Text
-          style={styles.link}
-          onPress={() => navigation.replace('Login')}
-        >
+        <Text style={styles.link} onPress={() => navigation.replace('Login')}>
           Back to Login
         </Text>
       </View>
@@ -55,40 +52,11 @@ const ForgotPassword = ({ navigation }: any) => {
 };
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: '#0A0F1F',
-    justifyContent: 'center',
-    paddingHorizontal: 28,
-  },
-  card: {
-    backgroundColor: '#0F1629',
-    padding: 28,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: '#1E293B',
-  },
-  heading: {
-    color: '#F8FAFC',
-    fontSize: 22,
-    fontWeight: '700',
-    marginBottom: 16,
-  },
-  input: {
-    backgroundColor: '#020617',
-    borderWidth: 1,
-    borderColor: '#1E293B',
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    color: '#E5E7EB',
-    marginTop: 14,
-  },
-  link: {
-    color: '#60A5FA',
-    textAlign: 'center',
-    marginTop: 16,
-  },
+  root: { flex: 1, backgroundColor: '#0A0F1F', justifyContent: 'center', paddingHorizontal: 28 },
+  card: { backgroundColor: '#0F1629', padding: 28, borderRadius: 14, borderWidth: 1, borderColor: '#1E293B' },
+  heading: { color: '#F8FAFC', fontSize: 22, fontWeight: '700', marginBottom: 16 },
+  input: { backgroundColor: '#020617', borderWidth: 1, borderColor: '#1E293B', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, color: '#E5E7EB', marginTop: 14 },
+  link: { color: '#60A5FA', textAlign: 'center', marginTop: 16 },
 });
 
 export default ForgotPassword;

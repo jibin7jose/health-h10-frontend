@@ -1,3 +1,4 @@
+// src/components/ClubAdminNavbar.tsx
 import React from 'react';
 import {
   View,
@@ -30,8 +31,7 @@ const ClubAdminNavbar: React.FC<Props> = ({
         styles.navbar,
         {
           backgroundColor: isDark ? '#020617' : '#FFFFFF',
-          paddingTop:
-            Platform.OS === 'android' ? StatusBar.currentHeight : 44,
+          paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 44,
         },
       ]}
     >
@@ -49,7 +49,6 @@ const ClubAdminNavbar: React.FC<Props> = ({
         {title}
       </Text>
 
-      {/* ✅ CLUB ADMIN ICON */}
       <TouchableOpacity>
         <Ionicons
           name="people-outline"

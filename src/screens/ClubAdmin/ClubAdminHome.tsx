@@ -1,5 +1,3 @@
-// src/screens/ClubAdmin/ClubAdminHome.tsx
-
 import React, { useState } from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 
@@ -29,13 +27,7 @@ const ClubAdminHome = () => {
       default:
         return (
           <View style={styles.center}>
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: '700',
-                color: theme === 'dark' ? '#E5E7EB' : '#020617',
-              }}
-            >
+            <Text style={{ fontSize: 20, fontWeight: '700', color: theme === 'dark' ? '#E5E7EB' : '#020617' }}>
               Welcome Club Admin
             </Text>
           </View>
@@ -44,28 +36,11 @@ const ClubAdminHome = () => {
   };
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: theme === 'dark' ? '#020617' : '#F1F5F9' },
-      ]}
-    >
-      {sidebarOpen && (
-        <SidebarClubAdmin
-          active={active}
-          setActive={setActive}
-          closeSidebar={toggleSidebar}
-        />
-      )}
+    <View style={[styles.container, { backgroundColor: theme === 'dark' ? '#020617' : '#F1F5F9' }]}>
+      {sidebarOpen && <SidebarClubAdmin active={active} setActive={setActive} closeSidebar={toggleSidebar} />}
 
       <View style={styles.content}>
-        {/* ✅✅✅ FIX IS HERE */}
-        <ClubAdminNavbar
-          title={active}
-          toggleSidebar={toggleSidebar}
-          sidebarOpen={sidebarOpen}
-        />
-
+        <ClubAdminNavbar title={active} toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
         {renderScreen()}
       </View>
     </View>
@@ -73,18 +48,9 @@ const ClubAdminHome = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'row',
-  },
-  content: {
-    flex: 1,
-  },
-  center: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  container: { flex: 1, flexDirection: 'row' },
+  content: { flex: 1 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 });
 
-export default ClubAdminHome; // ✅ REQUIRED
+export default ClubAdminHome;

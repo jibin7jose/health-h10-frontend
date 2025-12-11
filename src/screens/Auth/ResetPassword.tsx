@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import CustomButton from '../../components/CustomButton';
 import { resetPassword } from '../../api/auth';
 
@@ -9,7 +9,6 @@ const ResetPassword = ({ navigation }: any) => {
   const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleReset = async () => {
-
     console.log('✅ TOKEN FROM INPUT:', `"${token}"`);
 
     if (!token || !password || !confirmPassword) {
@@ -22,7 +21,7 @@ const ResetPassword = ({ navigation }: any) => {
 
     try {
       await resetPassword({
-        token: token.trim(), // ✅ CRITICAL FIX
+        token: token.trim().toUpperCase(),
         password,
       });
 
@@ -52,6 +51,7 @@ const ResetPassword = ({ navigation }: any) => {
           onChangeText={setToken}
           style={styles.input}
           placeholderTextColor="#9CA3AF"
+          autoCapitalize="characters"
         />
 
         <TextInput
@@ -73,6 +73,14 @@ const ResetPassword = ({ navigation }: any) => {
         />
 
         <CustomButton title="Reset Password" onPress={handleReset} />
+
+        {/* 🔙 BACK TO LOGIN BUTTON */}
+        <TouchableOpacity
+          onPress={() => navigation.replace('Login')}
+          style={styles.backBtn}
+        >
+          <Text style={styles.backText}>← Back to Login</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -107,6 +115,17 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     color: '#E5E7EB',
     marginTop: 14,
+  },
+
+  // BACK BUTTON STYLES
+  backBtn: {
+    marginTop: 16,
+    alignSelf: 'center',
+  },
+  backText: {
+    color: '#60A5FA',
+    fontSize: 15,
+    fontWeight: '500',
   },
 });
 
